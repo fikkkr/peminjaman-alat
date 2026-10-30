@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('pengembalians', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('peminjaman_id')->constrained('peminjamans')->cascadeOnDelete();
+            $table->foreignId('detail_peminjaman_id')->constrained('detail_peminjamans')->cascadeOnDelete();
             $table->string('catatan')->nullable();
             $table->timestamps();
 
-            $table->unique(['detail_peminjaman_id']);
+            $table->unique('detail_peminjaman_id');
         });
     }
 
