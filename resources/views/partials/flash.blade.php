@@ -1,0 +1,1 @@
+@if(session('sukses'))<div class="alert">{{ session('sukses') }}</div>@endif @if(session('error'))<div class="alert alert-error">{{ session('error') }}</div>@endif @if($errors->any())<div class="alert alert-error"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif

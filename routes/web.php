@@ -1,7 +1,8 @@
 <?php
-
-use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
-});
+use Illuminate\Support\Facades\Route; use App\Http\Controllers\AuthController; use App\Http\Controllers\DashboardController; use App\Http\Controllers\PeminjamanController; use App\Http\Controllers\DetailPeminjamansController; use App\Http\Controllers\PengembalianController; use App\Http\Controllers\PersetujuanController; use App\Http\Controllers\DaftarAlatController; use App\Http\Controllers\LaporanController; use App\Http\Controllers\LogAktivitasController;
+Route::get('/',fn()=>auth()->check()?redirect()->route('dashboard'):redirect()->route('login'));
+Route::middleware('guest')->group(function(){Route::get('/login',[AuthController::class,'showLogin'])->name('login');Route::post('/login',[AuthController::class,'login']);});
+Route::middleware('auth')->group(function(){Route::post('/logout',[AuthController::class,'logout'])->name('logout');Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
+Route::middleware('role:admin')->group(function(){Route::delete('/peminjaman/{peminjaman}',[PeminjamanController::class,'destroy'])->name('peminjaman.destroy');Route::resource('users',App\Http\Controllers\UsersController::class);Route::resource('kategoris',App\Http\Controllers\KategorisController::class);Route::resource('alats',App\Http\Controllers\AlatsController::class);Route::get('/log-aktivitas',[LogAktivitasController::class,'index'])->name('log-aktivitas');});
+Route::middleware('role:petugas')->group(function(){Route::get('/persetujuan',[PersetujuanController::class,'index'])->name('persetujuan.index');Route::post('/persetujuan/{peminjaman}/setujui',[PersetujuanController::class,'setujui'])->name('persetujuan.setujui');Route::post('/persetujuan/{peminjaman}/tolak',[PersetujuanController::class,'tolak'])->name('persetujuan.tolak');Route::get('/laporan',[LaporanController::class,'index'])->name('laporan.index');});Route::middleware('role:peminjam')->get('/daftar-alat',[DaftarAlatController::class,'index'])->name('daftar-alat');
+Route::get('/peminjaman',[PeminjamanController::class,'index'])->name('peminjaman.index');Route::get('/peminjaman/create',[PeminjamanController::class,'create'])->name('peminjaman.create');Route::post('/peminjaman',[PeminjamanController::class,'store'])->name('peminjaman.store');Route::get('/detail-peminjaman',[DetailPeminjamansController::class,'index'])->name('detail-peminjaman');Route::post('/detail-peminjaman/{detail}/pengembalian',[PengembalianController::class,'store'])->name('pengembalian.store');Route::get('/pengembalian',[PengembalianController::class,'index'])->name('pengembalian.index');});

@@ -1,0 +1,7 @@
+<?php
+namespace App\Http\Controllers;
+use App\Models\DetailPeminjamans; use App\Models\Pengembalians; use App\Support\CatatLog; use Illuminate\Support\Facades\DB; use Illuminate\Validation\ValidationException;
+class PengembalianController extends Controller {
+ public function index(){ $q=Pengembalians::with(['detail.alat','detail.peminjaman.user'])->latest();if(auth()->user()->role==='peminjam')$q->whereHas('detail.peminjaman',fn($x)=>$x->where('user_id',auth()->id()));return view('pengembalians.index',['pengembalians'=>$q->paginate(15)]); }
+ public function store(DetailPeminjamans $detail){$role=auth()->user()->role;abort_unless(in_array($role,['admin','peminjam'],true),403,'Anda tidak memiliki akses ke halaman ini.');if($role==='peminjam'&&(int)$detail->peminjaman()->value('user_id')!==(int)auth()->id())abort(403,'Anda tidak memiliki akses ke halaman ini.');abort_unless($detail->peminjaman()->value('status_peminjaman')==='disetujui',403);if($detail->status)return back()->with('error','Alat ini sudah dikembalikan sebelumnya.');DB::transaction(function()use($detail){$d=DetailPeminjamans::lockForUpdate()->findOrFail($detail->id);if($d->status)throw ValidationException::withMessages(['pengembalian'=>'Alat ini sudah dikembalikan sebelumnya.']);Pengembalians::create(['detail_peminjaman_id'=>$d->id,'catatan'=>null]);$d->update(['status'=>true]);$d->alat()->increment('stok',$d->jumlah);});CatatLog::buat('Pengembalian dicatat');return back()->with('sukses','Alat dikembalikan. Stok sudah ditambah kembali.'); }
+}

@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title',isset($kategori)?'Ubah Kategori':'Tambah Kategori')
+@section('content')<section class="card"><form method="POST" action="{{ isset($kategori)?route('kategoris.update',$kategori):route('kategoris.store') }}">@csrf @isset($kategori)@method('PUT')@endisset<label class="form-group">Nama Kategori<input class="input" name="nama_kategori" value="{{ old('nama_kategori',$kategori->nama_kategori??'') }}" required></label><label class="form-group">Deskripsi<textarea class="input" name="deskripsi">{{ old('deskripsi',$kategori->deskripsi??'') }}</textarea></label><button class="btn btn-primary">Simpan</button> <a class="btn" href="{{ route('kategoris.index') }}">Batal</a></form></section>@endsection
